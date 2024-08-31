@@ -81,3 +81,4 @@ def get_selection(curve, selection, p1, p2=None):
 # Example usage
 # Assuming curve, selection, p1, and p2 are already defined
 # points = get_selection(curve, selection, p1, p2)
+

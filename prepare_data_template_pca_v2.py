@@ -14,11 +14,15 @@ def prepare_data_template_pca_v2(data_in, W, xmm, *args):
     """
     if W is None or W.size == 0:
         raise ValueError('W is empty')
+    
+    # Check if xmm needs to be resized to match the number of columns in data_in
+    if xmm.shape[0] != data_in.shape[1]:
+        raise ValueError(f"xmm must have the same number of elements as the columns in data_in, got {xmm.shape[0]} and {data_in.shape[1]}")
 
-    # xmm = np.asarray(xmm).flatten() # TODO do we need asarray?
-    xmm = np.flatten()
-    m = data_in.shape[0] # Extract number of rows
+    # Number of traces
+    m = data_in.shape[0]
 
     # Process the data
-    data_out = (data_in - np.ones((m, 1)) @ xmm[np.newaxis, :]) @ W # TODO test if right
+    data_out = (data_in - np.ones((m, 1)) @ xmm[np.newaxis, :]) @ W
+    
     return data_out

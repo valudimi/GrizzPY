@@ -1,6 +1,6 @@
-import numpy as np
-import mmap
 import struct
+import mmap
+import numpy as np
 from read_metadata import read_metadata
 
 def format_converter(fmt):
@@ -13,7 +13,7 @@ def format_converter(fmt):
 
 def get_mmap(fname):
     metadata = read_metadata(fname)
-    
+
     mmap_data = {}
 
     with open(fname, 'rb') as f:
@@ -54,5 +54,4 @@ def get_mmap(fname):
 # Example usage for testing
 # fname = 'e2_bat_fb_beta_raw_s_0_3071.raw'
 # mmap_data, metadata = get_mmap(fname)
-# # print(mmap_data['X'][:10, :])  # Example output to verify correctness
-# print(mmap_data['X'][0:30, 0:30])
+# print(mmap_data['X'][0:30, 0:30]) # Seems to track the matlab output

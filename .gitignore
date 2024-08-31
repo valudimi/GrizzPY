@@ -2,3 +2,12 @@
 *.tpl
 *.mat2
 *.rawe2
+*.pkl
+*.mat
+*.pdf
+restats
+
+/.DS_Store
+/__pycache__
+/figures
+/results

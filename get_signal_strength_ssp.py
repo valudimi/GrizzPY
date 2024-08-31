@@ -59,7 +59,3 @@ def get_signal_strength_ssp(M, B, W, nr_traces):
         curves['ftest'] = ftest
 
     return curves
-
-# Example usage
-# Assuming M, B, W, and nr_traces are already defined
-# curves = get_signal_strength_ssp(M, B, W, nr_traces)
