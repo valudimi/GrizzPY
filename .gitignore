@@ -5,7 +5,9 @@
 *.pkl
 *.mat
 *.pdf
+*copy*
 restats
+outputbkp.txt
 
 /.DS_Store
 /__pycache__

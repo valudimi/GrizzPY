@@ -41,10 +41,18 @@ def get_ge_from_success_info(sinfo, nr_traces_vec):
         for j in range(nr_iter):
             avg_sum += np.log2(np.mean(d_avg[f'group{k+1}'][:, j]))
             joint_sum += np.log2(np.mean(d_joint[f'group{k+1}'][:, j]))
+            # in the original code, the values for 
+            # sinfo['depth']['avg'][f'group{k+1}'][:, j]
+            # decrease as k increases, which is not the case here
+            # TODO: figure out why and fix
+            # print(d_avg[f'group{k+1}'][:, j])
+            # print(d_joint[f'group{k+1}'][:, j])
 
         g['avg'][k] = avg_sum / nr_iter
         g['joint'][k] = joint_sum / nr_iter
+        # print(g)
 
+    # print(g)
     return g
 
 def get_line_properties_templates(uid, style):
@@ -77,17 +85,17 @@ def get_line_properties_templates(uid, style):
 
     elif style == 'fancy':
         if uid == 0:
-            slines = {'Color': 'm', 'LineStyle': '-', 'LineWidth': 2, 'Marker': 'o'}
+            slines = {'Color': 'm', 'LineStyle': '-', 'LineWidth': 1, 'Marker': 'o'}
         elif uid == 1:
-            slines = {'Color': 'c', 'LineStyle': '--', 'LineWidth': 2, 'Marker': '+'}
+            slines = {'Color': 'c', 'LineStyle': '--', 'LineWidth': 1, 'Marker': '+'}
         elif uid == 2:
-            slines = {'Color': 'g', 'LineStyle': '-.', 'LineWidth': 2, 'Marker': '*'}
+            slines = {'Color': 'g', 'LineStyle': '-.', 'LineWidth': 1, 'Marker': '*'}
         elif uid == 3:
-            slines = {'Color': 'k', 'LineStyle': '-', 'LineWidth': 2, 'Marker': '.'}
+            slines = {'Color': 'k', 'LineStyle': '-', 'LineWidth': 1, 'Marker': '.'}
         elif uid == 4:
-            slines = {'Color': 'b', 'LineStyle': '--', 'LineWidth': 2, 'Marker': 'x'}
+            slines = {'Color': 'b', 'LineStyle': '--', 'LineWidth': 1, 'Marker': 'x'}
         elif uid == 5:
-            slines = {'Color': 'r', 'LineStyle': '-.', 'LineWidth': 2, 'Marker': 's'}
+            slines = {'Color': 'r', 'LineStyle': '-.', 'LineWidth': 1, 'Marker': 's'}
         else:
             raise ValueError('uid not supported')
 

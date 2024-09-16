@@ -2,6 +2,7 @@ import numpy as np
 
 def compute_ssp_e2_mmap_multi(s_data, inbytes, pts=[], roffset=[]):
     nr_sets = s_data['nr_sets']
+    # print(f's_data = {s_data}')
     nr_groups = s_data['metadata'][0]['nr_groups']
 
     # Check if all sets have the same number of groups
@@ -17,7 +18,7 @@ def compute_ssp_e2_mmap_multi(s_data, inbytes, pts=[], roffset=[]):
         raise ValueError('Some index in bytes is outside available groups')
 
     # Determine the number of points
-    print(f'pts = {pts}')
+    # print(f'pts = {pts}')
     # if pts is None or not pts:
     if not pts: # TODO determine whether None or not
         nr_points = s_data['metadata'][0]['nr_points']
@@ -42,27 +43,58 @@ def compute_ssp_e2_mmap_multi(s_data, inbytes, pts=[], roffset=[]):
     # Compute the group means and the residual matrix W
     print('Computing the mean vectors M and the residual matrix W...')
     mmap_data = s_data['mmap_data']
-    for k in range(nr_bytes):
-        idx = 0
-        L = np.zeros((np_total, nr_points))
+    # print(f'length of mmap_data = {len(mmap_data)}')
+    # print(mmap_data)
 
-        for i in range(nr_sets):
-          # kindex = np.where(s_data['mmap_data'][i]['data'][0]['B'][1, :] == inbytes[k])[0]
-            kindex = np.where(mmap_data[i]['data'][0]['B'][1, :] == inbytes[k])[0]
-            lindex = kindex[s_data['idx'][i]]
-          # L(idx:idx+length(lindex)-1,:) = double(s_data.mmap_data{i}.data(1).X(pts,lindex)');
-            L[idx:idx+len(lindex), :] = mmap_data[i]['data'][0]['X'] \
-                                    [pts, :][:, lindex].T#.astype(np.float64)
+    # if condition to check if there is only one set; this massively cuts
+    # down runtime if only one set is used
+    if len(mmap_data) == 1:
+        X_map = mmap_data[0]['X'][pts, :]
+        B_map = mmap_data[0]['B'][1, :]
+        i = s_data['idx'][0]
 
-            # if roffset is not None or not roffset:
-            if not roffset:
-                L[idx:idx+len(lindex), :] += np.outer(roffset[i][:, inbytes[k]], np.ones(nr_points))
+        for k in range(nr_bytes):
+            # print('am intrat in primul for')
+            kindex = np.where(B_map == inbytes[k])[0]
+            lindex = kindex[i]
+            L = X_map[:, lindex].T
+            if roffset:
+                print('am intrat in roffset')
+                L += np.outer(roffset[0][:, inbytes[k]], np.ones(nr_points))
 
-            idx += len(lindex)
+            M[k, :] = np.mean(L, axis=0)
+            X = L - M[k, :]
+            W += np.dot(X.T, X)
 
-        M[k, :] = np.mean(L, axis=0)
-        X = L - M[k, :]
-        W += X.T @ X
+    else:
+        for k in range(nr_bytes):
+            print('am intrat in al doilea for')
+            idx = 0
+            L = np.zeros((np_total, nr_points))
+
+            for i in range(nr_sets):
+                print(i)
+            # kindex = np.where(s_data['mmap_data'][i]['data'][0]['B'][1, :] == inbytes[k])[0]
+                # kindex = np.where(mmap_data[i]['data'][0]['B'][1, :] == inbytes[k])[0]
+                kindex = np.where(mmap_data[i]['B'][1, :] == inbytes[k])[0]
+                lindex = kindex[s_data['idx'][i]]
+                print(f'kindex = {kindex}\nlindex = {lindex}')
+            # L(idx:idx+length(lindex)-1,:) = double(s_data.mmap_data{i}.data(1).X(pts,lindex)');
+                # L[idx:idx+len(lindex), :] = mmap_data[i]['data'][0]['X'] \
+                L[idx:idx+len(lindex), :] = mmap_data[i]['X'] \
+                                        [pts, :][:, lindex].T#.astype(np.float64)
+                print('am trecut de L')
+                # if roffset is not None or not roffset:
+                if roffset:
+                    print('am intrat in roffset')
+                    L[idx:idx+len(lindex), :] += np.outer(roffset[i][:, inbytes[k]], np.ones(nr_points))
+
+                idx += len(lindex)
+
+            M[k, :] = np.mean(L, axis=0)
+            X = L - M[k, :]
+            # W += X.T @ X
+            W += np.dot(X.T, X)
 
     mvec = np.mean(M, axis=0)
 
@@ -74,4 +106,4 @@ def compute_ssp_e2_mmap_multi(s_data, inbytes, pts=[], roffset=[]):
     B *= np_total
 
     print(f'M = {M}\nB = {B}\nW = {W}')
-    return M, B, W
+    return M, B, W, np_total # TODO check if np_total should be returned
